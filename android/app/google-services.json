@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1059973304424",
+    "project_id": "fitmentor-3c971",
+    "storage_bucket": "fitmentor-3c971.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1059973304424:android:c9e918126321116aafebdd",
+        "android_client_info": {
+          "package_name": "com.example.fitmentor"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDHSzIM9sREnE_Sf0jX9aPDMpzqpvubRuM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
