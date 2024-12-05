@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'SignIn.dart'; // Import the SignIn page
+import 'SignIn.dart';
+import 'SignUP.dart'; // Import the SignIn page
 
 class Home extends StatelessWidget {
   const Home({super.key});
@@ -60,7 +61,7 @@ class Home extends StatelessWidget {
                       // Navigate to SignIn page
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const SignIn()),
+                        MaterialPageRoute(builder: (context) => const SignUpScreen()),
                       );
                     },
                     style: ElevatedButton.styleFrom(

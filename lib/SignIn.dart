@@ -27,7 +27,7 @@ class _SignInState extends State<SignIn> {
       // Check if the email and password exist in Firebase Realtime Database
       String sanitizedEmail = email.replaceAll('@', '_').replaceAll('.', '_');
       final snapshot = await _dbRef
-          .child('Users')  // Assuming 'Users' is the collection in your Realtime Database
+          .child('Users') // Assuming 'Users' is the collection in your Realtime Database
           .child(sanitizedEmail)
           .get();
 
@@ -36,10 +36,12 @@ class _SignInState extends State<SignIn> {
 
         // Compare stored password with input password
         if (userData['password'] == password) {
-          // Navigate to the Health Profile screen
+          // Navigate to the Health Profile screen with the user email
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => const HealthProfileBuilder(userEmail: '',)),
+            MaterialPageRoute(
+              builder: (context) => HealthProfileBuilder(userEmail: email),
+            ),
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -53,7 +55,7 @@ class _SignInState extends State<SignIn> {
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('An unexpected error occurred.')),
+        SnackBar(content: Text('An unexpected error occurred: $e')),
       );
     }
   }

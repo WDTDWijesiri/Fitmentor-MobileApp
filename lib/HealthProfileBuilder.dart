@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'health_form.dart';
+
+import 'SignUP.dart';
 
 class HealthProfileBuilder extends StatefulWidget {
-  final String userEmail; // Passing user email as a parameter
+  final String userEmail;
 
   const HealthProfileBuilder({super.key, required this.userEmail});
 
@@ -27,6 +31,48 @@ class _HealthProfileBuilderState extends State<HealthProfileBuilder> {
       setState(() {
         _selectedImageFile = File(pickedFile.path);
       });
+    }
+  }
+
+  Future<void> _updateUserProfile() async {
+    final currentUserEmail = widget.userEmail;
+
+    if (currentUserEmail.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("User email is empty! Please log in again.")),
+      );
+      return;
+    }
+
+    // Convert the email to a Firebase-safe key format
+    final userKey = currentUserEmail.replaceAll('.', '_');
+
+    // Reference to Firebase Realtime Database
+    DatabaseReference userRef =
+    FirebaseDatabase.instance.ref().child('Users').child(userKey);
+
+    try {
+      await userRef.update({
+        'age': int.tryParse(ageController.text) ?? 0,
+        'weight': int.tryParse(weightController.text) ?? 0,
+        'height_feet': int.tryParse(feetController.text) ?? 0,
+        'height_inches': int.tryParse(inchesController.text) ?? 0,
+        'gender': selectedGender ?? 'Not Specified',
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("User profile updated successfully!")),
+      );
+
+      // Navigate to the next screen after updating the profile
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => HealthForm()),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error updating profile: $e")),
+      );
     }
   }
 
@@ -80,15 +126,18 @@ class _HealthProfileBuilderState extends State<HealthProfileBuilder> {
             const SizedBox(height: 20),
             buildEditableField("Age", ageController, TextInputType.number),
             buildGenderDropdown(),
-            buildEditableField("Height (Feet)", feetController, TextInputType.number),
-            buildEditableField("Height (Inches)", inchesController, TextInputType.number),
+            buildEditableField(
+                "Height (Feet)", feetController, TextInputType.number),
+            buildEditableField(
+                "Height (Inches)", inchesController, TextInputType.number),
             buildEditableField("Weight", weightController, TextInputType.number),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () {},
+              onPressed: _updateUserProfile,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.deepPurple,
-                padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 15),
+                padding:
+                const EdgeInsets.symmetric(horizontal: 100, vertical: 15),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -114,7 +163,8 @@ class _HealthProfileBuilderState extends State<HealthProfileBuilder> {
     );
   }
 
-  Widget buildEditableField(String label, TextEditingController controller, TextInputType keyboardType) {
+  Widget buildEditableField(String label, TextEditingController controller,
+      TextInputType keyboardType) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: TextField(
@@ -146,6 +196,21 @@ class _HealthProfileBuilderState extends State<HealthProfileBuilder> {
           labelText: "Gender",
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
         ),
+      ),
+    );
+  }
+}
+
+// Define the new UI screen (you can customize it as needed)
+class NewUIScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("New UI Screen"),
+      ),
+      body: Center(
+        child: const Text("You have successfully updated your profile!"),
       ),
     );
   }
