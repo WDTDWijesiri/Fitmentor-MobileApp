@@ -4,8 +4,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'health_form.dart';
 
-import 'SignUP.dart';
-
 class HealthProfileBuilder extends StatefulWidget {
   final String userEmail;
 
@@ -64,10 +62,10 @@ class _HealthProfileBuilderState extends State<HealthProfileBuilder> {
         const SnackBar(content: Text("User profile updated successfully!")),
       );
 
-      // Navigate to the next screen after updating the profile
+      // Navigate to the HealthForm screen with the updated email
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => HealthForm()),
+        MaterialPageRoute(builder: (context) => HealthForm(userEmail: currentUserEmail)),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -196,21 +194,6 @@ class _HealthProfileBuilderState extends State<HealthProfileBuilder> {
           labelText: "Gender",
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
         ),
-      ),
-    );
-  }
-}
-
-// Define the new UI screen (you can customize it as needed)
-class NewUIScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("New UI Screen"),
-      ),
-      body: Center(
-        child: const Text("You have successfully updated your profile!"),
       ),
     );
   }
