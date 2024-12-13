@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 
+import 'HealthScanScreen.dart';
+
 class HealthForm extends StatefulWidget {
   final String userEmail;
 
@@ -74,7 +76,12 @@ class _HealthFormState extends State<HealthForm> {
       );
 
       // Navigate to another screen or give feedback to the user
-      Navigator.pop(context);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const HealthScanScreen(),
+        ),
+      );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Error updating data: $e")),
