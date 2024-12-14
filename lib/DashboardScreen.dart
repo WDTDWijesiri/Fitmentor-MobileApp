@@ -7,7 +7,7 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   double progress = 0.7; // Initial progress value (0.0 to 1.0)
-  int calories = 1000; // Initial calorie value
+  int calories = 700; // Initial calorie value
 
   @override
   Widget build(BuildContext context) {

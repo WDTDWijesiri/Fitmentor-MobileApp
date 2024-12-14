@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:file_picker/file_picker.dart';
+import 'dart:io';
 
 import 'DashboardScreen.dart';
 
@@ -44,11 +46,10 @@ class _HealthScanScreenState extends State<HealthScanScreen> {
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                // Handle submit action
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) =>  DashboardScreen(),
+                    builder: (context) => DashboardScreen(),
                   ),
                 );
               },
@@ -113,7 +114,7 @@ class _HealthScanScreenState extends State<HealthScanScreen> {
   }
 }
 
-class FileUploadScreen extends StatelessWidget {
+class FileUploadScreen extends StatefulWidget {
   final String reportType;
   final VoidCallback onFileUploaded;
 
@@ -124,10 +125,36 @@ class FileUploadScreen extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  _FileUploadScreenState createState() => _FileUploadScreenState();
+}
+
+class _FileUploadScreenState extends State<FileUploadScreen> {
+  File? selectedFile;
+
+  Future<void> pickFile() async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles();
+      if (result != null) {
+        setState(() {
+          selectedFile = File(result.files.single.path!);
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('No file selected.')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error picking file: $e')),
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Upload $reportType"),
+        title: Text("Upload ${widget.reportType}"),
         centerTitle: true,
       ),
       body: Padding(
@@ -141,41 +168,52 @@ class FileUploadScreen extends StatelessWidget {
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 40),
-            Container(
-              height: 200,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey, width: 1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.cloud_upload, size: 50, color: Colors.grey),
-                    const SizedBox(height: 10),
-                    Text(
-                      "Drag & Drop file or ",
-                      style: TextStyle(color: Colors.grey[600]),
-                    ),
-                    const Text(
-                      "Browse",
-                      style: TextStyle(color: Colors.blue),
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      "Supported formats: JPEG, PNG, PDF",
-                      style: TextStyle(color: Colors.grey[500], fontSize: 12),
-                    ),
-                  ],
+            GestureDetector(
+              onTap: pickFile,
+              child: Container(
+                height: 200,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey, width: 1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.cloud_upload, size: 50, color: Colors.grey),
+                      const SizedBox(height: 10),
+                      Text(
+                        selectedFile != null
+                            ? "File Selected: ${selectedFile!.path.split('/').last}"
+                            : "Drag & Drop file or Browse",
+                        style: TextStyle(color: Colors.grey[600]),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 10),
+                      const Text(
+                        "Supported formats: JPEG, PNG, PDF",
+                        style: TextStyle(color: Colors.grey, fontSize: 12),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
             const Spacer(),
             ElevatedButton(
               onPressed: () {
-                onFileUploaded();
-                Navigator.pop(context);
+                if (selectedFile != null) {
+                  widget.onFileUploaded();
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('File "${selectedFile!.path.split('/').last}" uploaded successfully!')),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Please select a file to upload.')),
+                  );
+                }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.deepPurple,
