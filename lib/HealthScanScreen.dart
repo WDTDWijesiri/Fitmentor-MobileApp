@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'DashboardScreen.dart';
+
 class HealthScanScreen extends StatefulWidget {
   const HealthScanScreen({Key? key}) : super(key: key);
 
@@ -43,6 +45,12 @@ class _HealthScanScreenState extends State<HealthScanScreen> {
             ElevatedButton(
               onPressed: () {
                 // Handle submit action
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ManProgressBar(progress:0.6),
+                  ),
+                );
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.deepPurple,
@@ -150,7 +158,7 @@ class FileUploadScreen extends StatelessWidget {
                       "Drag & Drop file or ",
                       style: TextStyle(color: Colors.grey[600]),
                     ),
-                    Text(
+                    const Text(
                       "Browse",
                       style: TextStyle(color: Colors.blue),
                     ),

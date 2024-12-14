@@ -63,6 +63,7 @@ flutter:
     - assets/icons/facebook.svg
     - assets/icons/instagram.svg
     - assets/icons/linkedin.svg
+    - assets/man.JPG
 
 
   # The following line ensures that the Material Icons font is

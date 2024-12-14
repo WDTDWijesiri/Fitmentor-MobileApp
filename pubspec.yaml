@@ -66,12 +66,14 @@ dev_dependencies:
 # The following section is specific to Flutter packages.
 flutter:
   assets:
+    - assets/man.JPG
     - assets/logo.png
     - assets/logo/logo.png
     - assets/images/food.jpg
     - assets/icons/facebook.svg
     - assets/icons/instagram.svg
     - assets/icons/linkedin.svg
+
 
 
   # The following line ensures that the Material Icons font is

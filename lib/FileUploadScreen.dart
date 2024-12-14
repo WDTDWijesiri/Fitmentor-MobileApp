@@ -11,33 +11,35 @@ class FileUploadScreen extends StatefulWidget {
 }
 
 class _FileUploadScreenState extends State<FileUploadScreen> {
-  String? fileName; // To store the selected file's name
-  File? _selectedFile; // To store the selected file
+  FilePickerResult? result;
+  String? _filename;
+  PlatformFile? pickedfile;
+  bool isLoading = false;
+  File? fileToDisplay;
 
-  Future<void> pickFile() async {
+  void pickFile() async {
     try {
-      debugPrint("Browse button clicked");
-
-      // Open the file picker to select a single file
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
-        type: FileType.any, // Allows any type of file
-        allowMultiple: false, // Disable multiple file selection
+      setState(() {
+        isLoading = true;
+      });
+      result = await FilePicker.platform.pickFiles(
+        type: FileType.any,
+        allowMultiple: false,
       );
-
       if (result != null) {
-        // File selected successfully
-        setState(() {
-          fileName = result.files.single.name; // Get the name of the selected file
-          _selectedFile = File(result.files.single.path!); // Store the file path
-        });
-        debugPrint("File selected: $fileName");
-      } else {
-        // User canceled the file picker
-        debugPrint("File picking cancelled");
+        _filename = result!.files.first.name;
+        pickedfile = result!.files.first;
+        fileToDisplay = File(pickedfile!.path.toString());
+        debugPrint('File name: $_filename');
       }
+      setState(() {
+        isLoading = false;
+      });
     } catch (e) {
-      // Catch and print any errors during file picking
       debugPrint("Error picking file: $e");
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -77,23 +79,31 @@ class _FileUploadScreenState extends State<FileUploadScreen> {
             ),
             const SizedBox(height: 20),
             TextButton(
-              onPressed: () {
-                pickFile(); // Call the pickFile method
-              },
+              onPressed: pickFile, // Set to the pickFile method
               style: TextButton.styleFrom(
-                foregroundColor: Colors.blue, // Text color
-                padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
-                textStyle: const TextStyle(fontSize: 16),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
               ),
-              child: const Text("Browse"),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: const [
+                  Icon(Icons.file_upload, color: Colors.blue),
+                  SizedBox(width: 8),
+                  Text(
+                    "Browse",
+                    style: TextStyle(color: Colors.blue, fontSize: 16),
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 20),
-            Text(
-              fileName != null ? "Selected file: $fileName" : "No file selected",
-              style: const TextStyle(fontSize: 14, color: Colors.black),
-            ),
-            if (_selectedFile != null) const SizedBox(height: 5),
-            if (_selectedFile != null)
+            if (_filename != null)
+              Text(
+                "Selected file: $_filename",
+                style: const TextStyle(fontSize: 14, color: Colors.black),
+              ),
+            if (fileToDisplay != null) const SizedBox(height: 10),
+            if (fileToDisplay != null)
               const Text(
                 "File ready for upload",
                 style: TextStyle(fontSize: 14, color: Colors.green),
