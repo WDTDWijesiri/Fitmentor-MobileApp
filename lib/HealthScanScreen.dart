@@ -48,7 +48,7 @@ class _HealthScanScreenState extends State<HealthScanScreen> {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const ManProgressBar(progress:0.6),
+                    builder: (context) =>  DashboardScreen(),
                   ),
                 );
               },
