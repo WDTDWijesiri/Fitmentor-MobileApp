@@ -58,8 +58,7 @@ class _HealthFormState extends State<HealthForm> {
     final userKey = widget.userEmail.replaceAll('.', '_');
 
     // Reference to Firebase Realtime Database
-    DatabaseReference userRef =
-    FirebaseDatabase.instance.ref().child('Users').child(userKey);
+    DatabaseReference userRef = FirebaseDatabase.instance.ref().child('Users').child(userKey);
 
     try {
       // Update user data in Firebase
@@ -69,17 +68,21 @@ class _HealthFormState extends State<HealthForm> {
         'smokingHabits': smokingHabits ?? 'Not Specified',
         'exerciseLevel': exerciseLevel ?? 'Not Specified',
         'sleepPattern': sleepPattern ?? 'Not Specified',
+        'BloodTestReport': false, // Initial values for health reports
+        'BloodPressure': false,
+        'Urinalysis': false,
+        'ECG': false,
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Health data updated successfully!")),
       );
 
-      // Navigate to another screen or give feedback to the user
+      // Navigate to HealthScanScreen
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => const HealthScanScreen(),
+          builder: (context) => HealthScanScreen(userEmail: widget.userEmail),
         ),
       );
     } catch (e) {

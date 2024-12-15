@@ -1,3 +1,4 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'dart:io';
@@ -5,7 +6,9 @@ import 'dart:io';
 import 'DashboardScreen.dart';
 
 class HealthScanScreen extends StatefulWidget {
-  const HealthScanScreen({Key? key}) : super(key: key);
+  final String userEmail;
+
+  const HealthScanScreen({Key? key, required this.userEmail}) : super(key: key);
 
   @override
   _HealthScanScreenState createState() => _HealthScanScreenState();
@@ -18,6 +21,12 @@ class _HealthScanScreenState extends State<HealthScanScreen> {
     "Urinalysis": false,
     "ECG": false,
   };
+
+  Future<void> _updateReportStatus(String report) async {
+    final userKey = widget.userEmail.replaceAll('.', '_');
+    DatabaseReference userRef = FirebaseDatabase.instance.ref().child('Users').child(userKey);
+    await userRef.update({report: true}); // Mark the report as uploaded
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -103,6 +112,7 @@ class _HealthScanScreenState extends State<HealthScanScreen> {
                 onFileUploaded: () {
                   setState(() {
                     uploadedReports[title] = true;
+                    _updateReportStatus(title); // Update Firebase status
                   });
                 },
               ),

@@ -67,6 +67,9 @@ dev_dependencies:
 flutter:
   assets:
     - assets/images/man.png
+    - assets/images/man1.png
+    - assets/images/man-removebg-preview.svg
+    - assets/images/Wavy_Bus-08_Single-05.jpg
     - assets/logo.png
     - assets/logo/logo.png
     - assets/images/food.jpg

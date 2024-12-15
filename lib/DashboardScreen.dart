@@ -1,3 +1,4 @@
+import 'package:fitmentor/userprofile.dart';
 import 'package:flutter/material.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -15,7 +16,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        title: Text(
+        title: const Text(
           'Dashboard',
           style: TextStyle(color: Colors.black),
         ),
@@ -27,12 +28,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
           TextButton(
             onPressed: () {},
             child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
                 color: Colors.orange,
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Text(
+              child: const Text(
                 'Go Premium',
                 style: TextStyle(color: Colors.white),
               ),
@@ -43,8 +44,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
       body: Column(
         children: [
           // Date Navigation
-          Padding(
-            padding: const EdgeInsets.all(16.0),
+          const Padding(
+            padding: EdgeInsets.all(16.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -62,30 +63,37 @@ class _DashboardScreenState extends State<DashboardScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.black,
+                color: Colors.lightGreenAccent,
                 borderRadius: BorderRadius.circular(16),
               ),
-              padding: EdgeInsets.all(16),
+              padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
-                  Text(
+                  const Text(
                     'Calorie Budget',
                     style: TextStyle(color: Colors.white, fontSize: 16),
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Text(
                     '$calories',
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.orange,
                       fontSize: 40,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   // Human Image as Progress Bar
                   Container(
                     height: 180, // Adjusted to fit the human image better
                     width: 120,
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: Colors.white, // Border color for the progress bar
+                        width: 3, // Border thickness
+                      ),
+                      borderRadius: BorderRadius.circular(60), // Border's rounded corners
+                    ),
                     child: Stack(
                       alignment: Alignment.center,
                       children: [
@@ -117,7 +125,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         Positioned(
                           child: Text(
                             '$calories cal',
-                            style: TextStyle(
+                            style: const TextStyle(
                               color: Colors.black,
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
@@ -127,7 +135,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ],
                     ),
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
@@ -142,7 +150,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ),
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           // My Analysis and Weight In
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -153,7 +161,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ],
             ),
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           // Discover Section
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -167,19 +175,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ],
       ),
       bottomNavigationBar: BottomAppBar(
-        shape: CircularNotchedRectangle(),
+        shape: const CircularNotchedRectangle(),
         notchMargin: 8,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             IconButton(
-              icon: Icon(Icons.home),
+              icon: const Icon(Icons.home),
               onPressed: () {},
             ),
-            SizedBox(width: 40), // Space for Floating Action Button
+            const SizedBox(width: 40), // Space for Floating Action Button
             IconButton(
-              icon: Icon(Icons.person),
-              onPressed: () {},
+              icon: const Icon(Icons.person),
+              onPressed: () {
+                // Navigate to UserProfile on person icon click
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => UserProfile()),
+                );
+              },
             ),
           ],
         ),
@@ -191,7 +205,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             calories = (calories + 100).clamp(0, 2000); // Increase calories value
           });
         },
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
@@ -202,11 +216,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
       children: [
         Text(
           value,
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         Text(
           title,
-          style: TextStyle(color: Colors.white, fontSize: 12),
+          style: const TextStyle(color: Colors.white, fontSize: 12),
         ),
       ],
     );
@@ -217,14 +231,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
       leading: Icon(icon, color: Colors.black),
       title: Text(
         title,
-        style: TextStyle(fontWeight: FontWeight.bold),
+        style: const TextStyle(fontWeight: FontWeight.bold),
       ),
       trailing: trailingText.isNotEmpty
           ? Text(
         trailingText,
-        style: TextStyle(color: Colors.black),
+        style: const TextStyle(color: Colors.black),
       )
-          : Icon(Icons.arrow_forward_ios, size: 16, color: Colors.black),
+          : const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.black),
     );
   }
 }
