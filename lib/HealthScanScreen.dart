@@ -58,7 +58,7 @@ class _HealthScanScreenState extends State<HealthScanScreen> {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => DashboardScreen(),
+                    builder: (context) => DashboardScreen(userEmail: widget.userEmail), // Pass the user email
                   ),
                 );
               },

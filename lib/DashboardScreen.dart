@@ -1,7 +1,11 @@
-import 'package:fitmentor/userprofile.dart';
 import 'package:flutter/material.dart';
+import 'userprofile.dart';
 
 class DashboardScreen extends StatefulWidget {
+  final String userEmail;
+
+  DashboardScreen({Key? key, required this.userEmail}) : super(key: key);
+
   @override
   _DashboardScreenState createState() => _DashboardScreenState();
 }
@@ -191,7 +195,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 // Navigate to UserProfile on person icon click
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => UserProfile()),
+                  MaterialPageRoute(builder: (context) => UserProfile(userEmail: widget.userEmail)),
                 );
               },
             ),
@@ -245,7 +249,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
 void main() {
   runApp(MaterialApp(
-    home: DashboardScreen(),
+    home: DashboardScreen(userEmail: 'user@example.com'), // Example email, pass the real one in your app
     debugShowCheckedModeBanner: false,
   ));
 }
