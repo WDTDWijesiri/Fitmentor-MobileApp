@@ -21,17 +21,15 @@ class _UserProfileState extends State<UserProfile> {
   }
 
   void _fetchUserDetails(String email) async {
-    // Query Firebase Realtime Database to find the user by email
-    final snapshot = await _databaseReference
-        .child('users')
-        .orderByChild('email')
-        .equalTo(email)
-        .once();
+    // Replace dots with underscores in email as shown in the database structure
+    String emailKey = email.replaceAll('.', '_');
 
-    if (snapshot.snapshot.value != null) {
+    // Query Firebase Realtime Database to get user details by email key
+    final snapshot = await _databaseReference.child('Users').child(emailKey).get();
+
+    if (snapshot.exists) {
       setState(() {
-        userData = Map<String, dynamic>.from(
-            (snapshot.snapshot.value as Map).values.first);
+        userData = Map<String, dynamic>.from(snapshot.value as Map);
       });
     }
   }
@@ -97,18 +95,24 @@ class _UserProfileState extends State<UserProfile> {
                 const SizedBox(height: 20),
 
                 // User Profile Information
-                UserInfoField(label: 'User name', value: userData!['name']),
-                const SizedBox(height: 10),
-                UserInfoField(label: 'Email', value: userData!['email']),
-                const SizedBox(height: 10),
                 UserInfoField(label: 'Age', value: userData!['age'].toString()),
                 const SizedBox(height: 10),
                 UserInfoField(label: 'Gender', value: userData!['gender']),
                 const SizedBox(height: 10),
-                UserInfoField(label: 'Height', value: userData!['height']),
+                UserInfoField(label: 'Height', value: '${userData!['height_feet']} ft ${userData!['height_inches']} in'),
                 const SizedBox(height: 10),
-                UserInfoField(label: 'Weight', value: userData!['weight']),
-                const SizedBox(height: 20),
+                UserInfoField(label: 'Weight', value: '${userData!['weight']} kg'),
+                const SizedBox(height: 10),
+                UserInfoField(label: 'Profession', value: '${userData!['profession']} '),
+                const SizedBox(height: 10),
+                UserInfoField(label: 'AlcoholConsumption', value: '${userData!['alcoholConsumption']} '),
+                const SizedBox(height: 10),
+                UserInfoField(label: 'ExerciseLevel', value: '${userData!['exerciseLevel']} '),
+                const SizedBox(height: 10),
+                UserInfoField(label: 'SmokingHabits', value: '${userData!['smokingHabits']} '),
+                const SizedBox(height: 10),
+                UserInfoField(label: 'sleepPattern', value: '${userData!['sleepPattern']} '),
+                const SizedBox(height: 10),
               ],
             )
                 : const Center(child: CircularProgressIndicator()), // Show loading indicator while fetching
