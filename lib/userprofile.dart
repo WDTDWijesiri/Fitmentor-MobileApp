@@ -21,10 +21,8 @@ class _UserProfileState extends State<UserProfile> {
   }
 
   void _fetchUserDetails(String email) async {
-    // Replace dots with underscores in email as shown in the database structure
     String emailKey = email.replaceAll('.', '_');
 
-    // Query Firebase Realtime Database to get user details by email key
     final snapshot = await _databaseReference.child('Users').child(emailKey).get();
 
     if (snapshot.exists) {
@@ -32,6 +30,268 @@ class _UserProfileState extends State<UserProfile> {
         userData = Map<String, dynamic>.from(snapshot.value as Map);
       });
     }
+  }
+
+  void _updateUserData(String key, dynamic value) async {
+    String emailKey = widget.userEmail.replaceAll('.', '_');
+    await _databaseReference.child('Users').child(emailKey).update({key: value});
+  }
+
+  // List of professions
+  final List<String> professions = [
+    'Office and Administrative Jobs',
+    'Manual Labor and Skilled Trades',
+    'Health and Medical Professions',
+    'Education and Training',
+    'Creative and Design Professions',
+  ];
+
+  // List of alcohol consumption options
+  final List<String> alcoholConsumptionOptions = ['None', 'Frequent'];
+
+  // List of smoking habits options
+  final List<String> smokingHabitsOptions = ['None', 'Frequent'];
+
+  // List of exercise levels
+  final List<String> exerciseLevels = ['None', 'Light', 'Moderate', 'Intense'];
+
+  // List of sleep patterns
+  final List<String> sleepPatterns = [
+    'Less than 6 hrs',
+    '6–7 hrs',
+    '7–9 hrs',
+    '10+ hrs'
+  ];
+
+  // Show Gender Selection Modal
+  void _showGenderSelection() {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          height: 200,
+          child: Column(
+            children: [
+              const Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Text('Your Gender', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              ),
+              ListTile(
+                title: const Text('Male'),
+                onTap: () {
+                  setState(() {
+                    userData!['gender'] = 'Male';
+                  });
+                  _updateUserData('gender', 'Male');
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                title: const Text('Female'),
+                onTap: () {
+                  setState(() {
+                    userData!['gender'] = 'Female';
+                  });
+                  _updateUserData('gender', 'Female');
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  // Show Profession Selection Modal
+  void _showProfessionSelection() {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          height: 400,
+          child: Column(
+            children: [
+              const Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Text('Your Profession', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              ),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: professions.length,
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      title: Text(professions[index]),
+                      onTap: () {
+                        setState(() {
+                          userData!['profession'] = professions[index];
+                        });
+                        _updateUserData('profession', professions[index]);
+                        Navigator.pop(context);
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  // Show Alcohol Consumption Modal
+  void _showAlcoholConsumptionSelection() {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          height: 200,
+          child: Column(
+            children: [
+              const Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Text('Alcohol Consumption', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              ),
+              ListTile(
+                title: const Text('None'),
+                onTap: () {
+                  setState(() {
+                    userData!['alcoholConsumption'] = 'None';
+                  });
+                  _updateUserData('alcoholConsumption', 'None');
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                title: const Text('Frequent'),
+                onTap: () {
+                  setState(() {
+                    userData!['alcoholConsumption'] = 'Frequent';
+                  });
+                  _updateUserData('alcoholConsumption', 'Frequent');
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  // Show Smoking Habits Modal
+  void _showSmokingHabitsSelection() {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          height: 200,
+          child: Column(
+            children: [
+              const Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Text('Smoking Habits', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              ),
+              ListTile(
+                title: const Text('None'),
+                onTap: () {
+                  setState(() {
+                    userData!['smokingHabits'] = 'None';
+                  });
+                  _updateUserData('smokingHabits', 'None');
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                title: const Text('Frequent'),
+                onTap: () {
+                  setState(() {
+                    userData!['smokingHabits'] = 'Frequent';
+                  });
+                  _updateUserData('smokingHabits', 'Frequent');
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  // Show Exercise Level Modal
+  void _showExerciseLevelSelection() {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          height: 300,
+          child: Column(
+            children: [
+              const Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Text('Exercise Level', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              ),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: exerciseLevels.length,
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      title: Text(exerciseLevels[index]),
+                      onTap: () {
+                        setState(() {
+                          userData!['exerciseLevel'] = exerciseLevels[index];
+                        });
+                        _updateUserData('exerciseLevel', exerciseLevels[index]);
+                        Navigator.pop(context);
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  // Show Sleep Pattern Modal
+  void _showSleepPatternSelection() {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          height: 300,
+          child: Column(
+            children: [
+              const Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Text('Sleep Pattern', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              ),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: sleepPatterns.length,
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      title: Text(sleepPatterns[index]),
+                      onTap: () {
+                        setState(() {
+                          userData!['sleepPattern'] = sleepPatterns[index];
+                        });
+                        _updateUserData('sleepPattern', sleepPatterns[index]);
+                        Navigator.pop(context);
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -62,7 +322,7 @@ class _UserProfileState extends State<UserProfile> {
           ),
           // Overlay with gray color and 0.6 opacity
           Container(
-            color: Colors.grey.withOpacity(0.6),
+            color: Colors.grey.withOpacity(0.4),
           ),
           // Profile Details Over the Background
           Padding(
@@ -71,51 +331,88 @@ class _UserProfileState extends State<UserProfile> {
                 ? Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const SizedBox(height: 100), // Adds space for the transparent app bar
-                // Profile Picture with Edit Button
-                Stack(
-                  children: [
-                    CircleAvatar(
-                      radius: 50,
-                      backgroundColor: Colors.grey[200], // Placeholder background color
-                      child: const Icon(Icons.person, size: 50, color: Colors.grey), // Placeholder Icon
-                    ),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: IconButton(
-                        icon: const Icon(Icons.edit, color: Colors.blue),
-                        onPressed: () {
-                          // Edit action here
-                        },
-                      ),
-                    ),
-                  ],
+                const SizedBox(height: 100), // Adds space for the transparent AppBar
+                CircleAvatar(
+                  radius: 60,
+                  backgroundImage: userData!['profileImageUrl'] != null
+                      ? NetworkImage(userData!['profileImageUrl'])
+                      : null, // Use NetworkImage if there's a profileImageUrl
+                  child: userData!['profileImageUrl'] == null
+                      ? const Icon(Icons.person, size: 60)
+                      : null, // Default icon when no profile image
                 ),
-                const SizedBox(height: 20),
-
-                // User Profile Information
-                UserInfoField(label: 'Age', value: userData!['age'].toString()),
-                const SizedBox(height: 10),
-                UserInfoField(label: 'Gender', value: userData!['gender']),
-                const SizedBox(height: 10),
-                UserInfoField(label: 'Height', value: '${userData!['height_feet']} ft ${userData!['height_inches']} in'),
-                const SizedBox(height: 10),
-                UserInfoField(label: 'Weight', value: '${userData!['weight']} kg'),
-                const SizedBox(height: 10),
-                UserInfoField(label: 'Profession', value: '${userData!['profession']} '),
-                const SizedBox(height: 10),
-                UserInfoField(label: 'AlcoholConsumption', value: '${userData!['alcoholConsumption']} '),
-                const SizedBox(height: 10),
-                UserInfoField(label: 'ExerciseLevel', value: '${userData!['exerciseLevel']} '),
-                const SizedBox(height: 10),
-                UserInfoField(label: 'SmokingHabits', value: '${userData!['smokingHabits']} '),
-                const SizedBox(height: 10),
-                UserInfoField(label: 'sleepPattern', value: '${userData!['sleepPattern']} '),
-                const SizedBox(height: 10),
+                const SizedBox(height: 16),
+                Text(
+                  userData!['fullName'] ?? 'Full Name',
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black54,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  userData!['email'] ?? 'Email',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: Colors.white70,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Expanded(
+                  child: ListView(
+                    children: [
+                      UserInfoField(
+                        label: 'Age',
+                        value: userData!['age'].toString(),
+                        onTap: _showGenderSelection,
+                      ),
+                      UserInfoField(
+                        label: 'Gender',
+                        value: userData!['gender'] ?? 'Not specified',
+                        onTap: _showGenderSelection,
+                      ),
+                      UserInfoField(
+                        label: 'Height',
+                        value: '${userData!['height_feet']} ft ${userData!['height_inches']} in' ?? 'Not specified',
+                        onTap: _showGenderSelection,
+                      ),
+                      UserInfoField(
+                        label: 'Weight',
+                        value: '${userData!['weight']} kg' ?? 'Not specified',
+                        onTap: _showGenderSelection,
+                      ),
+                      UserInfoField(
+                        label: 'Profession',
+                        value: userData!['profession'] ?? 'Not specified',
+                        onTap: _showProfessionSelection,
+                      ),
+                      UserInfoField(
+                        label: 'Alcohol Consumption',
+                        value: userData!['alcoholConsumption'] ?? 'Not specified',
+                        onTap: _showAlcoholConsumptionSelection,
+                      ),
+                      UserInfoField(
+                        label: 'Smoking Habits',
+                        value: userData!['smokingHabits'] ?? 'Not specified',
+                        onTap: _showSmokingHabitsSelection,
+                      ),
+                      UserInfoField(
+                        label: 'Exercise Level',
+                        value: userData!['exerciseLevel'] ?? 'Not specified',
+                        onTap: _showExerciseLevelSelection,
+                      ),
+                      UserInfoField(
+                        label: 'Sleep Pattern',
+                        value: userData!['sleepPattern'] ?? 'Not specified',
+                        onTap: _showSleepPatternSelection,
+                      ),
+                    ],
+                  ),
+                ),
               ],
             )
-                : const Center(child: CircularProgressIndicator()), // Show loading indicator while fetching
+                : const Center(child: CircularProgressIndicator()),
           ),
         ],
       ),
@@ -126,32 +423,41 @@ class _UserProfileState extends State<UserProfile> {
 class UserInfoField extends StatelessWidget {
   final String label;
   final String value;
+  final VoidCallback onTap;
 
-  const UserInfoField({super.key, required this.label, required this.value});
+  const UserInfoField({
+    Key? key,
+    required this.label,
+    required this.value,
+    required this.onTap,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      decoration: BoxDecoration(
-        color: Colors.grey[200]?.withOpacity(0.8), // Semi-transparent background for the input field
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Row(
-        children: [
-          Text(
-            '$label: ',
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
+    return GestureDetector(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
             ),
-          ),
-          Expanded(
-            child: Text(
+            Text(
               value,
-              style: const TextStyle(fontSize: 16),
+              style: const TextStyle(
+                fontSize: 18,
+                color: Colors.black54,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

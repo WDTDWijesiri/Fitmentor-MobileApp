@@ -1,4 +1,9 @@
+import 'package:fitmentor/snacks.dart';
 import 'package:flutter/material.dart';
+import 'breakfast.dart'; // Import the breakfast.dart page
+import 'dinner.dart';
+import 'exercise.dart';
+import 'lunch.dart';
 import 'userprofile.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -143,11 +148,51 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      _buildMealData('Exercise', '0'),
-                      _buildMealData('Breakfast', '0'),
-                      _buildMealData('Lunch', '0'),
-                      _buildMealData('Dinner', '0'),
-                      _buildMealData('Snacks', '0'),
+                      _buildMealData('Exercise', '0',(){
+                        // Navigate to the BreakfastPage when Breakfast is clicked
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ExercisePage(userEmail: widget.userEmail),
+                          ),
+                        );
+                      }),
+                      _buildMealData('Breakfast', '0', () {
+                        // Navigate to the BreakfastPage when Breakfast is clicked
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => BreakfastPage(userEmail: widget.userEmail),
+                          ),
+                        );
+                      }),
+                      _buildMealData('Lunch', '0', () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => LunchPage(userEmail: widget.userEmail),
+                          ),
+                        );
+                      }),
+                      _buildMealData('Dinner', '0', () {
+                        // Navigate to the DinnerPage when Dinner is clicked
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DinnerPage(userEmail: widget.userEmail),
+                          ),
+                        );
+                      }),
+
+                      _buildMealData('Snacks', '0',(){
+                        // Navigate to the DinnerPage when Dinner is clicked
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SnacksPage(userEmail: widget.userEmail),
+                          ),
+                        );
+                      }),
                     ],
                   ),
                 ],
@@ -215,18 +260,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildMealData(String title, String value) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
-        Text(
-          title,
-          style: const TextStyle(color: Colors.white, fontSize: 12),
-        ),
-      ],
+  Widget _buildMealData(String title, String value, [VoidCallback? onTap]) {
+    return GestureDetector(
+      onTap: onTap, // Assign the onTap if provided, otherwise it's null
+      child: Column(
+        children: [
+          Text(
+            value,
+            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          ),
+          Text(
+            title,
+            style: const TextStyle(color: Colors.white, fontSize: 12),
+          ),
+        ],
+      ),
     );
   }
 
