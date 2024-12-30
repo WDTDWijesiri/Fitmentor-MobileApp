@@ -102,7 +102,9 @@ class _BreakfastPageState extends State<BreakfastPage> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pop(context);
+            // Pass totalCaloriesBreakfast back when user presses the back button
+            int totalCalories = _getTotalCalories();
+            Navigator.pop(context, totalCalories);
           },
         ),
         title: Text('Breakfast for ${widget.userEmail}'),

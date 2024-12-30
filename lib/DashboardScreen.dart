@@ -1,3 +1,4 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:fitmentor/snacks.dart';
 import 'package:flutter/material.dart';
 import 'breakfast.dart'; // Import the breakfast.dart page
@@ -17,9 +18,313 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   double progress = 0.7; // Initial progress value (0.0 to 1.0)
-  int calories = 700; // Initial calorie value
+  int calories = 0; // Initial calorie value
+  int breakfastCalories = 0;// Initial value for breakfast calories
+  int totalCalorieLunch=0;
+  int totalCalorieDinner = 0;
+  int totalCalorieSnacks = 0;
+  int totalCalorieExercise = 0;
+
+
+
+
+  // Firebase database reference
+  final DatabaseReference _dbRef = FirebaseDatabase.instance.ref();
+  @override
+  void initState() {
+    super.initState();
+    _fetchTotalCalories();
+    _fetchTotalCaloriesDinner();
+    _fetchTotalCaloriesSnacks();
+    _fetchTotalCaloriesExercise();
+    _fetchTotalCaloriesLunch();
+    _calculateTotalCalories();// Fetch total calories when the widget is initialized
+  }
+
+  // Method to fetch total calories from the food_log in Firebase
+  Future<void> _fetchTotalCalories() async {
+    try {
+      final foodLogSnapshot = await _dbRef.child('users/${widget.userEmail.replaceAll('.', ',')}/food_log').get();
+
+      if (foodLogSnapshot.exists) {
+        int totalCaloriesBreakfast = 0;
+
+        // Check if the value is a List or a Map
+        if (foodLogSnapshot.value is List) {
+          List<dynamic> foodLog = foodLogSnapshot.value as List<dynamic>;
+
+          // Loop through the list and sum the calories
+          for (var item in foodLog) {
+            if (item != null && item is Map<dynamic, dynamic>) {
+              var caloriesValue = item['calories'] ?? 0;
+              if (caloriesValue is int) {
+                totalCaloriesBreakfast += caloriesValue;
+              } else if (caloriesValue is double) {
+                totalCaloriesBreakfast += caloriesValue.toInt();
+              }
+            }
+          }
+        } else if (foodLogSnapshot.value is Map) {
+          Map<dynamic, dynamic> foodLog = foodLogSnapshot.value as Map<dynamic, dynamic>;
+
+          // Loop through the map and sum the calories
+          foodLog.forEach((key, value) {
+            var caloriesValue = value['calories'] ?? 0;
+            if (caloriesValue is int) {
+              totalCaloriesBreakfast += caloriesValue;
+            } else if (caloriesValue is double) {
+              totalCaloriesBreakfast += caloriesValue.toInt();
+            }
+          });
+        }
+
+        // Update the state with the new breakfast calories
+        setState(() {
+          breakfastCalories = totalCaloriesBreakfast;
+        });
+      } else {
+        setState(() {
+          breakfastCalories = 0; // No data found, set to 0
+        });
+      }
+      _calculateTotalCalories();
+    } catch (e) {
+      print('Error fetching calories: $e');
+      setState(() {
+        breakfastCalories = 0; // Handle errors gracefully
+      });
+      _calculateTotalCalories();
+    }
+  }
+  Future<void> _fetchTotalCaloriesLunch() async {
+    try {
+      final lunchLogSnapshot = await _dbRef.child('users/${widget.userEmail.replaceAll('.', ',')}/lunch_log').get();
+
+      if (lunchLogSnapshot.exists) {
+        int totalCaloriesLunch = 0;
+
+        // Check if the value is a List or a Map
+        if (lunchLogSnapshot.value is List) {
+          List<dynamic> lunchLog = lunchLogSnapshot.value as List<dynamic>;
+
+          // Loop through the list and sum the calories
+          for (var item in lunchLog) {
+            if (item != null && item is Map<dynamic, dynamic>) {
+              var caloriesValue = item['calories'] ?? 0;
+              if (caloriesValue is int) {
+                totalCaloriesLunch += caloriesValue;
+              } else if (caloriesValue is double) {
+                totalCaloriesLunch += caloriesValue.toInt();
+              }
+            }
+          }
+        } else if (lunchLogSnapshot.value is Map) {
+          Map<dynamic, dynamic> lunchLog = lunchLogSnapshot.value as Map<dynamic, dynamic>;
+
+          // Loop through the map and sum the calories
+          lunchLog.forEach((key, value) {
+            var caloriesValue = value['calories'] ?? 0;
+            if (caloriesValue is int) {
+              totalCaloriesLunch += caloriesValue;
+            } else if (caloriesValue is double) {
+              totalCaloriesLunch += caloriesValue.toInt();
+            }
+          });
+        }
+
+        // Update the state with the new lunch calories
+        setState(() {
+          totalCalorieLunch = totalCaloriesLunch;
+        });
+      } else {
+        setState(() {
+          totalCalorieLunch = 0; // No data found, set to 0
+        });
+      }
+      _calculateTotalCalories();
+    } catch (e) {
+      print('Error fetching lunch calories: $e');
+      setState(() {
+        totalCalorieLunch = 0; // Handle errors gracefully
+      });
+      _calculateTotalCalories();
+    }
+  }
+  Future<void> _fetchTotalCaloriesDinner() async {
+    try {
+      final dinnerLogSnapshot = await _dbRef.child('users/${widget.userEmail.replaceAll('.', ',')}/dinner_log').get();
+
+      if (dinnerLogSnapshot.exists) {
+        int totalCaloriesDinner = 0;
+
+        // Check if the value is a List or a Map
+        if (dinnerLogSnapshot.value is List) {
+          List<dynamic> dinnerLog = dinnerLogSnapshot.value as List<dynamic>;
+
+          // Loop through the list and sum the calories
+          for (var item in dinnerLog) {
+            if (item != null && item is Map<dynamic, dynamic>) {
+              var caloriesValue = item['calories'] ?? 0;
+              if (caloriesValue is int) {
+                totalCaloriesDinner += caloriesValue;
+              } else if (caloriesValue is double) {
+                totalCaloriesDinner += caloriesValue.toInt();
+              }
+            }
+          }
+        } else if (dinnerLogSnapshot.value is Map) {
+          Map<dynamic, dynamic> dinnerLog = dinnerLogSnapshot.value as Map<dynamic, dynamic>;
+
+          // Loop through the map and sum the calories
+          dinnerLog.forEach((key, value) {
+            var caloriesValue = value['calories'] ?? 0;
+            if (caloriesValue is int) {
+              totalCaloriesDinner += caloriesValue;
+            } else if (caloriesValue is double) {
+              totalCaloriesDinner += caloriesValue.toInt();
+            }
+          });
+        }
+
+        // Update the state with the new dinner calories
+        setState(() {
+          totalCalorieDinner = totalCaloriesDinner;
+        });
+      } else {
+        setState(() {
+          totalCalorieDinner = 0; // No data found, set to 0
+        });
+      }
+      _calculateTotalCalories();
+    } catch (e) {
+      print('Error fetching dinner calories: $e');
+      setState(() {
+        totalCalorieDinner = 0; // Handle errors gracefully
+      });
+      _calculateTotalCalories();
+    }
+  }
+  Future<void> _fetchTotalCaloriesSnacks() async {
+    try {
+      final snacksLogSnapshot = await _dbRef.child('users/${widget.userEmail.replaceAll('.', ',')}/snacks_log').get();
+
+      if (snacksLogSnapshot.exists) {
+        int totalCaloriesSnacks = 0;
+
+        // Check if the value is a List or a Map
+        if (snacksLogSnapshot.value is List) {
+          List<dynamic> snacksLog = snacksLogSnapshot.value as List<dynamic>;
+
+          // Loop through the list and sum the calories
+          for (var item in snacksLog) {
+            if (item != null && item is Map<dynamic, dynamic>) {
+              var caloriesValue = item['calories'] ?? 0;
+              if (caloriesValue is int) {
+                totalCaloriesSnacks += caloriesValue;
+              } else if (caloriesValue is double) {
+                totalCaloriesSnacks += caloriesValue.toInt();
+              }
+            }
+          }
+        } else if (snacksLogSnapshot.value is Map) {
+          Map<dynamic, dynamic> snacksLog = snacksLogSnapshot.value as Map<dynamic, dynamic>;
+
+          // Loop through the map and sum the calories
+          snacksLog.forEach((key, value) {
+            var caloriesValue = value['calories'] ?? 0;
+            if (caloriesValue is int) {
+              totalCaloriesSnacks += caloriesValue;
+            } else if (caloriesValue is double) {
+              totalCaloriesSnacks += caloriesValue.toInt();
+            }
+          });
+        }
+
+        // Update the state with the new snacks calories
+        setState(() {
+          totalCalorieSnacks = totalCaloriesSnacks;
+        });
+      } else {
+        setState(() {
+          totalCalorieSnacks = 0; // No data found, set to 0
+        });
+      }
+      _calculateTotalCalories();
+    } catch (e) {
+      print('Error fetching snacks calories: $e');
+      setState(() {
+        totalCalorieSnacks = 0; // Handle errors gracefully
+      });
+      _calculateTotalCalories();
+    }
+  }
+  Future<void> _fetchTotalCaloriesExercise() async {
+    try {
+      final exerciseLogSnapshot = await _dbRef.child('users/${widget.userEmail.replaceAll('.', ',')}/exercise_log').get();
+
+      if (exerciseLogSnapshot.exists) {
+        int totalCaloriesExercise = 0;
+
+        // Check if the value is a List or a Map
+        if (exerciseLogSnapshot.value is List) {
+          List<dynamic> exerciseLog = exerciseLogSnapshot.value as List<dynamic>;
+
+          // Loop through the list and sum the calories
+          for (var item in exerciseLog) {
+            if (item != null && item is Map<dynamic, dynamic>) {
+              var caloriesValue = item['calories'] ?? 0;
+              if (caloriesValue is int) {
+                totalCaloriesExercise += caloriesValue;
+              } else if (caloriesValue is double) {
+                totalCaloriesExercise += caloriesValue.toInt();
+              }
+            }
+          }
+        } else if (exerciseLogSnapshot.value is Map) {
+          Map<dynamic, dynamic> exerciseLog = exerciseLogSnapshot.value as Map<dynamic, dynamic>;
+
+          // Loop through the map and sum the calories
+          exerciseLog.forEach((key, value) {
+            var caloriesValue = value['calories'] ?? 0;
+            if (caloriesValue is int) {
+              totalCaloriesExercise += caloriesValue;
+            } else if (caloriesValue is double) {
+              totalCaloriesExercise += caloriesValue.toInt();
+            }
+          });
+        }
+
+        // Update the state with the new exercise calories
+        setState(() {
+          totalCalorieExercise = totalCaloriesExercise;
+        });
+      } else {
+        setState(() {
+          totalCalorieExercise = 0; // No data found, set to 0
+        });
+      }
+      _calculateTotalCalories();
+    } catch (e) {
+      print('Error fetching exercise calories: $e');
+      setState(() {
+        totalCalorieExercise = 0; // Handle errors gracefully
+      });
+      _calculateTotalCalories();
+    }
+  }
+  void _calculateTotalCalories() {
+    setState(() {
+      // Add calories from breakfast, lunch, dinner, and snacks, then subtract exercise calories
+      calories = (breakfastCalories + totalCalorieLunch + totalCalorieDinner + totalCalorieSnacks) - totalCalorieExercise;
+
+      // Update progress as a ratio (assuming a calorie goal of 2000 for example)
+      // progress = (calories / 2000).clamp(0.0, 1.0);
+    });
+  }
+
 
   @override
+
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -148,7 +453,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      _buildMealData('Exercise', '0',(){
+                      _buildMealData('Exercise', '$totalCalorieExercise',(){
                         // Navigate to the BreakfastPage when Breakfast is clicked
                         Navigator.push(
                           context,
@@ -157,7 +462,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           ),
                         );
                       }),
-                      _buildMealData('Breakfast', '0', () {
+                      _buildMealData('Breakfast', '$breakfastCalories', () {
                         // Navigate to the BreakfastPage when Breakfast is clicked
                         Navigator.push(
                           context,
@@ -166,7 +471,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           ),
                         );
                       }),
-                      _buildMealData('Lunch', '0', () {
+                      _buildMealData('Lunch', '$totalCalorieLunch', () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -174,7 +479,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           ),
                         );
                       }),
-                      _buildMealData('Dinner', '0', () {
+                      _buildMealData('Dinner', '$totalCalorieDinner', () {
                         // Navigate to the DinnerPage when Dinner is clicked
                         Navigator.push(
                           context,
@@ -184,7 +489,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         );
                       }),
 
-                      _buildMealData('Snacks', '0',(){
+                      _buildMealData('Snacks', '$totalCalorieSnacks',(){
                         // Navigate to the DinnerPage when Dinner is clicked
                         Navigator.push(
                           context,
