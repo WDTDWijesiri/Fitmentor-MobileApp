@@ -1,10 +1,13 @@
 import 'package:firebase_database/firebase_database.dart';
+import 'package:fitmentor/premium.dart';
 import 'package:fitmentor/snacks.dart';
+import 'package:fitmentor/water.dart';
 import 'package:flutter/material.dart';
 import 'breakfast.dart'; // Import the breakfast.dart page
 import 'dinner.dart';
 import 'exercise.dart';
 import 'lunch.dart';
+import 'myanalysis.dart';
 import 'userprofile.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -25,7 +28,135 @@ class _DashboardScreenState extends State<DashboardScreen> {
   int totalCalorieSnacks = 0;
   int totalCalorieExercise = 0;
 
-
+  // Data for the modal bottom sheet UI
+  int _selectedIndex = 0;
+  final List<String> _categories = [
+    'Breakfast',
+    'Lunch',
+    'Dinner',
+    'Snacks',
+    'Exercise',
+    'Water'
+  ];
+  final List<IconData> _icons = [
+    Icons.wb_sunny,
+    Icons.wb_sunny_outlined,
+    Icons.brightness_3,
+    Icons.fastfood,
+    Icons.fitness_center,
+    Icons.local_drink,
+  ];
+  // Function to show modal bottom sheet
+  void _showModalBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.all(16),
+          height: 400,
+          decoration: BoxDecoration(
+            color: Colors.grey[300],
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: Column(
+            children: [
+              GridView.builder(
+                shrinkWrap: true,
+                padding: const EdgeInsets.all(20),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  crossAxisSpacing: 20,
+                  mainAxisSpacing: 20,
+                ),
+                itemCount: _categories.length,
+                itemBuilder: (context, index) {
+                  return GestureDetector(
+                    onTap: () {
+                      if (index == 0) { // If the Breakfast icon is tapped
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => BreakfastPage(userEmail: widget.userEmail),
+                          ),
+                        );
+                      } else if (index == 1) { // If the Lunch icon is tapped
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => LunchPage(userEmail: widget.userEmail),
+                          ),
+                        );
+                      } else if (index == 2) { // If the Dinner icon is tapped
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DinnerPage(userEmail: widget.userEmail),
+                          ),
+                        );
+                      } else if (index == 3) { // If the Snacks icon is tapped
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SnacksPage(userEmail: widget.userEmail),
+                          ),
+                        );
+                      } else if (index == 4) { // If the Exercise icon is tapped
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ExercisePage(userEmail: widget.userEmail),
+                          ),
+                        );
+                      } else if (index == 5) { // If the Water icon is tapped
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => WaterScreen(),
+                          ),
+                        );
+                      }
+                      // Handle other taps for other categories here if needed
+                    },
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          _icons[index],
+                          size: 40,
+                          color: Colors.blue,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          _categories[index],
+                          style: const TextStyle(fontSize: 14),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+              Center(
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.pop(context); // Close the bottom sheet
+                  },
+                  child: const CircleAvatar(
+                    backgroundColor: Colors.green,
+                    radius: 30,
+                    child: Icon(
+                      Icons.clear,
+                      color: Colors.white,
+                      size: 30,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 
 
   // Firebase database reference
@@ -340,7 +471,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
         actions: [
           TextButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => PremiumPage()),
+              );
+            },
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
@@ -510,7 +646,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Column(
               children: [
-                _buildListTile(Icons.analytics, 'My Analysis', ''),
+                _buildListTile(Icons.analytics, 'My Analysis', '', () {
+                  // Navigate to MyAnalysisPage when My Analysis is clicked
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => MyAnalysisPage(),
+                    ),
+                  );
+                }),
+
                 _buildListTile(Icons.fitness_center, 'Weight In', '55kg'),
               ],
             ),
@@ -554,10 +699,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          setState(() {
-            progress = (progress + 0.1).clamp(0.0, 1.0); // Increase progress
-            calories = (calories + 100).clamp(0, 2000); // Increase calories value
-          });
+          _showModalBottomSheet(context);
         },
         child: const Icon(Icons.add),
       ),
@@ -583,7 +725,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildListTile(IconData icon, String title, String trailingText) {
+  Widget _buildListTile(IconData icon, String title, String trailingText, [VoidCallback? onTap]) {
     return ListTile(
       leading: Icon(icon, color: Colors.black),
       title: Text(
@@ -596,6 +738,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         style: const TextStyle(color: Colors.black),
       )
           : const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.black),
+      onTap: onTap, // Now this will handle the navigation if provided
     );
   }
 }
