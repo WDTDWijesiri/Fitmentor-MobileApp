@@ -2,9 +2,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart'; // Import for date formatting
 
 class SnacksPage extends StatefulWidget {
-  final String userEmail; // Add userEmail to constructor
+  final String userEmail;
 
   SnacksPage({Key? key, required this.userEmail}) : super(key: key);
 
@@ -13,7 +14,7 @@ class SnacksPage extends StatefulWidget {
 }
 
 class _SnacksPageState extends State<SnacksPage> {
-  List<Map<String, dynamic>> foodLog = []; // To store selected foods in log
+  List<Map<String, dynamic>> foodLog = [];
   List<Map<String, dynamic>> foodItems = [
     {'name': 'Chips', 'calories': 150, 'servings': 1},
     {'name': 'Apple', 'calories': 95, 'servings': 1},
@@ -27,24 +28,21 @@ class _SnacksPageState extends State<SnacksPage> {
   List<Map<String, dynamic>> filteredFoodItems = [];
   TextEditingController searchController = TextEditingController();
 
-  // Firebase Realtime Database reference
   late DatabaseReference _foodLogRef;
+  String currentDate = DateFormat('yyyy-MM-dd').format(DateTime.now()); // Get the current date
 
   @override
   void initState() {
     super.initState();
-    filteredFoodItems = foodItems; // Initially, show all items
-    // Initialize Firebase Realtime Database reference
-    _foodLogRef = FirebaseDatabase.instance.ref('users/${_sanitizeEmail(widget.userEmail)}/snacks_log');
+    filteredFoodItems = foodItems;
+    _foodLogRef = FirebaseDatabase.instance.ref('users/${_sanitizeEmail(widget.userEmail)}/snacks_log/$currentDate');
     _loadFoodLogFromDatabase();
   }
 
-  // Function to sanitize the email to use as a key
   String _sanitizeEmail(String email) {
-    return email.replaceAll('.', ','); // Firebase doesn't allow '.' in keys, so we replace it with ','
+    return email.replaceAll('.', ',');
   }
 
-  // Function to load food log from Firebase Realtime Database
   void _loadFoodLogFromDatabase() async {
     final snapshot = await _foodLogRef.get();
 
@@ -54,27 +52,25 @@ class _SnacksPageState extends State<SnacksPage> {
       if (data is List) {
         setState(() {
           foodLog = data
-              .where((item) => item is Map) // Ensure that each item is a Map
-              .map((item) => Map<String, dynamic>.from(item as Map)) // Safely cast to Map<String, dynamic>
+              .where((item) => item is Map)
+              .map((item) => Map<String, dynamic>.from(item as Map))
               .toList();
         });
       } else if (data is Map) {
         setState(() {
           foodLog = data.values
-              .where((item) => item is Map) // Ensure that each value is a Map
-              .map((item) => Map<String, dynamic>.from(item as Map)) // Safely cast to Map<String, dynamic>
+              .where((item) => item is Map)
+              .map((item) => Map<String, dynamic>.from(item as Map))
               .toList();
         });
       }
     }
   }
 
-  // Function to save food log to Firebase Realtime Database
   void _saveFoodLogToDatabase() {
     _foodLogRef.set(foodLog);
   }
 
-  // Function to calculate the total calories from the logged foods
   int _getTotalCalories() {
     int totalCaloriesSnacks = 0;
     for (var food in foodLog) {
@@ -83,7 +79,6 @@ class _SnacksPageState extends State<SnacksPage> {
     return totalCaloriesSnacks;
   }
 
-  // Function to filter food items based on search input
   void _filterFoodItems(String query) {
     setState(() {
       filteredFoodItems = foodItems
@@ -102,8 +97,36 @@ class _SnacksPageState extends State<SnacksPage> {
             Navigator.pop(context);
           },
         ),
-        title: Text('Snacks for ${widget.userEmail}'),
-        backgroundColor: Colors.purple,
+        title: Text('Snacks'),
+        centerTitle: true,
+        backgroundColor: Colors.green,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.calendar_today),
+            onPressed: () async {
+              DateTime? pickedDate = await showDatePicker(
+                context: context,
+                initialDate: DateTime.now(),
+                firstDate: DateTime(2000),
+                lastDate: DateTime(2101),
+              );
+
+              if (pickedDate != null) {
+                // Format the date as required
+                String formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
+
+                // Update the food log for the selected date
+                String sanitizedEmail = _sanitizeEmail(widget.userEmail);
+                setState(() {
+                  currentDate = formattedDate; // Update the current date variable
+                  _foodLogRef = FirebaseDatabase.instance.ref('users/$sanitizedEmail/snacks_log/$formattedDate');
+                  _loadFoodLogFromDatabase();  // Reload the food log for the selected date
+                });
+              }
+            },
+          )
+          ,
+        ],
       ),
       body: Column(
         children: [
@@ -137,7 +160,7 @@ class _SnacksPageState extends State<SnacksPage> {
                       setState(() {
                         foodLog.removeAt(index);
                       });
-                      _saveFoodLogToDatabase(); // Save updated food log
+                      _saveFoodLogToDatabase();
                     },
                   ),
                 );
@@ -197,7 +220,7 @@ class _SnacksPageState extends State<SnacksPage> {
                                     foodLog.remove(filteredFoodItems[index]);
                                   }
                                 });
-                                _saveFoodLogToDatabase(); // Save food log to database after modification
+                                _saveFoodLogToDatabase();
                               },
                               secondary: Icon(Icons.fastfood, color: Colors.orange),
                             ),
@@ -220,7 +243,7 @@ class _SnacksPageState extends State<SnacksPage> {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(); // Initialize Firebase
+  await Firebase.initializeApp();
   runApp(MaterialApp(
     home: SnacksPage(userEmail: 'user@example.com'),
     debugShowCheckedModeBanner: false,

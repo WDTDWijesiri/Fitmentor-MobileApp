@@ -44,6 +44,7 @@ dependencies:
   image_picker: ^0.8.7+5
   fl_chart: ^0.35.0 # Check for the latest version
   intl: ^0.18.0
+  numberpicker: ^2.1.1
 
 dev_dependencies:
   flutter_test:

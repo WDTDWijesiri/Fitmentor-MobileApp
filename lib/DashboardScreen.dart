@@ -3,6 +3,7 @@ import 'package:fitmentor/premium.dart';
 import 'package:fitmentor/snacks.dart';
 import 'package:fitmentor/water.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'breakfast.dart'; // Import the breakfast.dart page
 import 'dinner.dart';
 import 'exercise.dart';
@@ -175,7 +176,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
   // Method to fetch total calories from the food_log in Firebase
   Future<void> _fetchTotalCalories() async {
     try {
-      final foodLogSnapshot = await _dbRef.child('users/${widget.userEmail.replaceAll('.', ',')}/food_log').get();
+      // Get the current date in 'yyyy-MM-dd' format
+      String currentDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+      final foodLogSnapshot = await _dbRef.child('users/${widget.userEmail.replaceAll('.', ',')}/food_log/$currentDate').get();
 
       if (foodLogSnapshot.exists) {
         int totalCaloriesBreakfast = 0;
@@ -229,7 +232,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
   Future<void> _fetchTotalCaloriesLunch() async {
     try {
-      final lunchLogSnapshot = await _dbRef.child('users/${widget.userEmail.replaceAll('.', ',')}/lunch_log').get();
+      // Get the current date in 'yyyy-MM-dd' format
+      String currentDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+      final lunchLogSnapshot = await _dbRef.child('users/${widget.userEmail.replaceAll('.', ',')}/lunch_log/$currentDate').get();
 
       if (lunchLogSnapshot.exists) {
         int totalCaloriesLunch = 0;
@@ -283,7 +288,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
   Future<void> _fetchTotalCaloriesDinner() async {
     try {
-      final dinnerLogSnapshot = await _dbRef.child('users/${widget.userEmail.replaceAll('.', ',')}/dinner_log').get();
+      // Get the current date in 'yyyy-MM-dd' format
+      String currentDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+      final dinnerLogSnapshot = await _dbRef.child('users/${widget.userEmail.replaceAll('.', ',')}/dinner_log/$currentDate').get();
 
       if (dinnerLogSnapshot.exists) {
         int totalCaloriesDinner = 0;
@@ -337,7 +344,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
   Future<void> _fetchTotalCaloriesSnacks() async {
     try {
-      final snacksLogSnapshot = await _dbRef.child('users/${widget.userEmail.replaceAll('.', ',')}/snacks_log').get();
+      // Get the current date in 'yyyy-MM-dd' format
+      String currentDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+      final snacksLogSnapshot = await _dbRef.child('users/${widget.userEmail.replaceAll('.', ',')}/snacks_log/$currentDate').get();
 
       if (snacksLogSnapshot.exists) {
         int totalCaloriesSnacks = 0;
@@ -391,7 +400,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
   Future<void> _fetchTotalCaloriesExercise() async {
     try {
-      final exerciseLogSnapshot = await _dbRef.child('users/${widget.userEmail.replaceAll('.', ',')}/exercise_log').get();
+      // Get the current date in 'yyyy-MM-dd' format
+      String currentDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+      final exerciseLogSnapshot = await _dbRef.child('users/${widget.userEmail.replaceAll('.', ',')}/exercise_log/$currentDate').get();
 
       if (exerciseLogSnapshot.exists) {
         int totalCaloriesExercise = 0;

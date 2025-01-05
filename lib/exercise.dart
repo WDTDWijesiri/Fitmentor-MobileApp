@@ -2,9 +2,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart'; // For formatting the date
 
 class ExercisePage extends StatefulWidget {
-  final String userEmail; // Add userEmail to constructor
+  final String userEmail;
 
   ExercisePage({Key? key, required this.userEmail}) : super(key: key);
 
@@ -13,9 +14,9 @@ class ExercisePage extends StatefulWidget {
 }
 
 class _ExercisePageState extends State<ExercisePage> {
-  List<Map<String, dynamic>> exerciseLog = []; // To store selected exercises in log
+  List<Map<String, dynamic>> exerciseLog = [];
   List<Map<String, dynamic>> exerciseItems = [
-    {'name': 'Running', 'calories': 300, 'duration': 30}, // Calories burned in 30 minutes
+    {'name': 'Running', 'calories': 300, 'duration': 30},
     {'name': 'Cycling', 'calories': 250, 'duration': 30},
     {'name': 'Swimming', 'calories': 400, 'duration': 30},
     {'name': 'Weightlifting', 'calories': 200, 'duration': 30},
@@ -27,24 +28,22 @@ class _ExercisePageState extends State<ExercisePage> {
   List<Map<String, dynamic>> filteredExerciseItems = [];
   TextEditingController searchController = TextEditingController();
 
-  // Firebase Realtime Database reference
   late DatabaseReference _exerciseLogRef;
+  String currentDate = DateFormat('yyyy-MM-dd').format(DateTime.now()); // Get current date
 
   @override
   void initState() {
     super.initState();
-    filteredExerciseItems = exerciseItems; // Initially, show all items
-    // Initialize Firebase Realtime Database reference
-    _exerciseLogRef = FirebaseDatabase.instance.ref('users/${_sanitizeEmail(widget.userEmail)}/exercise_log');
+    filteredExerciseItems = exerciseItems;
+    _exerciseLogRef = FirebaseDatabase.instance
+        .ref('users/${_sanitizeEmail(widget.userEmail)}/exercise_log/$currentDate'); // Store under current date
     _loadExerciseLogFromDatabase();
   }
 
-  // Function to sanitize the email to use as a key
   String _sanitizeEmail(String email) {
-    return email.replaceAll('.', ','); // Firebase doesn't allow '.' in keys, so we replace it with ','
+    return email.replaceAll('.', ',');
   }
 
-  // Function to load exercise log from Firebase Realtime Database
   void _loadExerciseLogFromDatabase() async {
     final snapshot = await _exerciseLogRef.get();
 
@@ -54,27 +53,25 @@ class _ExercisePageState extends State<ExercisePage> {
       if (data is List) {
         setState(() {
           exerciseLog = data
-              .where((item) => item is Map) // Ensure that each item is a Map
-              .map((item) => Map<String, dynamic>.from(item as Map)) // Safely cast to Map<String, dynamic>
+              .where((item) => item is Map)
+              .map((item) => Map<String, dynamic>.from(item as Map))
               .toList();
         });
       } else if (data is Map) {
         setState(() {
           exerciseLog = data.values
-              .where((item) => item is Map) // Ensure that each value is a Map
-              .map((item) => Map<String, dynamic>.from(item as Map)) // Safely cast to Map<String, dynamic>
+              .where((item) => item is Map)
+              .map((item) => Map<String, dynamic>.from(item as Map))
               .toList();
         });
       }
     }
   }
 
-  // Function to save exercise log to Firebase Realtime Database
   void _saveExerciseLogToDatabase() {
     _exerciseLogRef.set(exerciseLog);
   }
 
-  // Function to calculate the total calories burned from the logged exercises
   int _getTotalCaloriesBurned() {
     int totalcaloriesExercise = 0;
     for (var exercise in exerciseLog) {
@@ -83,7 +80,6 @@ class _ExercisePageState extends State<ExercisePage> {
     return totalcaloriesExercise;
   }
 
-  // Function to filter exercise items based on search input
   void _filterExerciseItems(String query) {
     setState(() {
       filteredExerciseItems = exerciseItems
@@ -102,8 +98,33 @@ class _ExercisePageState extends State<ExercisePage> {
             Navigator.pop(context);
           },
         ),
-        title: Text('Exercise for ${widget.userEmail}'),
-        backgroundColor: Colors.blue,
+        title: Text('Exercise'),
+        centerTitle: true,
+        backgroundColor: Colors.green,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.calendar_today),
+            onPressed: () async {
+              DateTime? pickedDate = await showDatePicker(
+                context: context,
+                initialDate: DateTime.now(),
+                firstDate: DateTime(2000),
+                lastDate: DateTime(2101),
+              );
+
+              if (pickedDate != null) {
+                String formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
+                String sanitizedEmail = _sanitizeEmail(widget.userEmail);
+
+                setState(() {
+                  _exerciseLogRef = FirebaseDatabase.instance.ref('users/$sanitizedEmail/exercise_log/$formattedDate');
+                  _loadExerciseLogFromDatabase();
+                });
+              }
+            },
+          ),
+
+        ],
       ),
       body: Column(
         children: [
@@ -137,7 +158,7 @@ class _ExercisePageState extends State<ExercisePage> {
                       setState(() {
                         exerciseLog.removeAt(index);
                       });
-                      _saveExerciseLogToDatabase(); // Save updated exercise log
+                      _saveExerciseLogToDatabase();
                     },
                   ),
                 );
@@ -197,7 +218,7 @@ class _ExercisePageState extends State<ExercisePage> {
                                     exerciseLog.remove(filteredExerciseItems[index]);
                                   }
                                 });
-                                _saveExerciseLogToDatabase(); // Save exercise log to database after modification
+                                _saveExerciseLogToDatabase();
                               },
                               secondary: Icon(Icons.directions_run, color: Colors.blue),
                             ),
@@ -220,7 +241,7 @@ class _ExercisePageState extends State<ExercisePage> {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(); // Initialize Firebase
+  await Firebase.initializeApp();
   runApp(MaterialApp(
     home: ExercisePage(userEmail: 'user@example.com'),
     debugShowCheckedModeBanner: false,

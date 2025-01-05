@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:numberpicker/numberpicker.dart';
 
 class UserProfile extends StatefulWidget {
   final String userEmail;
@@ -14,6 +15,7 @@ class _UserProfileState extends State<UserProfile> {
   final DatabaseReference _databaseReference = FirebaseDatabase.instance.ref();
   Map<String, dynamic>? userData;
 
+  int selectedWeight = 50; // Default weight value
   @override
   void initState() {
     super.initState();
@@ -28,6 +30,7 @@ class _UserProfileState extends State<UserProfile> {
     if (snapshot.exists) {
       setState(() {
         userData = Map<String, dynamic>.from(snapshot.value as Map);
+        selectedWeight = userData!["weight"] ?? 50; // Set initial weight from database
       });
     }
   }
@@ -62,6 +65,54 @@ class _UserProfileState extends State<UserProfile> {
     '7–9 hrs',
     '10+ hrs'
   ];
+  void _showWeightSelection() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true, // Allows better control over the modal height
+      builder: (BuildContext context) {
+        return DraggableScrollableSheet(
+          expand: false,
+          builder: (context, scrollController) {
+            return ListView(
+              controller: scrollController,
+              padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+              shrinkWrap: true, // Adjust size based on content
+              children: [
+                const Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Text(
+                    'Select Your Weight (kg)',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                NumberPicker(
+                  value: selectedWeight,
+                  minValue: 1,
+                  maxValue: 150,
+                  onChanged: (value) {
+                    setState(() {
+                      selectedWeight = value;
+                    });
+                  },
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      userData!["weight"] = selectedWeight;
+                    });
+                    _updateUserData('weight', selectedWeight);
+                    Navigator.pop(context);
+                  },
+                  child: const Text("Confirm"),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
 
   // Show Gender Selection Modal
   void _showGenderSelection() {
@@ -320,7 +371,7 @@ class _UserProfileState extends State<UserProfile> {
               ),
             ),
           ),
-          // Overlay with gray color and 0.6 opacity
+          // Overlay with gray color and 0.4 opacity
           Container(
             color: Colors.grey.withOpacity(0.4),
           ),
@@ -328,39 +379,41 @@ class _UserProfileState extends State<UserProfile> {
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: userData != null
-                ? Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const SizedBox(height: 100), // Adds space for the transparent AppBar
-                CircleAvatar(
-                  radius: 60,
-                  backgroundImage: userData!['profileImageUrl'] != null
-                      ? NetworkImage(userData!['profileImageUrl'])
-                      : null, // Use NetworkImage if there's a profileImageUrl
-                  child: userData!['profileImageUrl'] == null
-                      ? const Icon(Icons.person, size: 60)
-                      : null, // Default icon when no profile image
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  userData!['fullName'] ?? 'Full Name',
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black54,
+                ? SingleChildScrollView( // Add SingleChildScrollView here
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const SizedBox(height: 100), // Adds space for the transparent AppBar
+                  CircleAvatar(
+                    radius: 60,
+                    backgroundImage: userData!['profileImageUrl'] != null
+                        ? NetworkImage(userData!['profileImageUrl'])
+                        : null, // Use NetworkImage if there's a profileImageUrl
+                    child: userData!['profileImageUrl'] == null
+                        ? const Icon(Icons.person, size: 60)
+                        : null, // Default icon when no profile image
                   ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  userData!['email'] ?? 'Email',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: Colors.white70,
+                  const SizedBox(height: 16),
+                  Text(
+                    userData!['fullName'] ?? 'Full Name',
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black54,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 16),
-                Expanded(
-                  child: ListView(
+                  const SizedBox(height: 8),
+                  Text(
+                    userData!['email'] ?? 'Email',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: Colors.white70,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  ListView(
+                    shrinkWrap: true, // This ensures the ListView doesn't overflow
+                    physics: const NeverScrollableScrollPhysics(), // Prevent nested scrolling
                     children: [
                       UserInfoField(
                         label: 'Age',
@@ -380,7 +433,7 @@ class _UserProfileState extends State<UserProfile> {
                       UserInfoField(
                         label: 'Weight',
                         value: '${userData!['weight']} kg' ?? 'Not specified',
-                        onTap: _showGenderSelection,
+                        onTap: _showWeightSelection,
                       ),
                       UserInfoField(
                         label: 'Profession',
@@ -409,8 +462,8 @@ class _UserProfileState extends State<UserProfile> {
                       ),
                     ],
                   ),
-                ),
-              ],
+                ],
+              ),
             )
                 : const Center(child: CircularProgressIndicator()),
           ),
